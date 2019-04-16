@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>DenInject.Core</id>
+    <version>1.0.4</version>
+    <title>DenInject.Core</title>
+    <authors>actualdennis</authors>
+    <owners>actualdennis</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Simple dependency injection container. For source code, visit: https://github.com/ActualDennis/DotnetPlatform/tree/master/DiContainer/DenInject.Core Any feedback is highly appreciated: actualdennis@gmail.com</description>
+    <releaseNotes>Added singleton instance / accessibility changes..</releaseNotes>
+	<tags>Dependency injection .NET Framework Singleton Transient </tags>
+    <copyright>Copyright 2019</copyright>
+  </metadata>
+</package>
