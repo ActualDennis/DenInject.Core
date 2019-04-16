@@ -157,8 +157,8 @@ namespace DenInject.Core {
                    where x.InterfaceType == implementationType
                    select x;
 
-            if (implementationType.IsInterface)
-                throw new InvalidOperationException("Cannot register interface as-self.");
+            if (implementationType.IsInterface || implementationType.IsAbstract)
+                throw new InvalidOperationException("Cannot register interface or abstract class as-self.");
 
             if (Entity.Count().Equals(0))
             {
