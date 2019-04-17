@@ -5,6 +5,8 @@ If you have no idea what DI is and what it's for, see [this](https://docs.micros
 
 1. Transient / singleton / singleton instance dependencies registration.
 
+Based on constructor dependencies [injection](https://en.wikipedia.org/wiki/Dependency_injection#Constructor_injection_comparison) 
+
 ``` csharp
 var config = new DiConfiguration();
 
@@ -49,4 +51,34 @@ config.RegisterTransient(typeof(IService<>), typeof(SomeService<>));
 
 provider.Resolve<IService<SomeRepository>>()
 
+```
+
+## Usage
+
+1. Registering dependencies:
+
+``` csharp
+
+var config = new DiConfiguration();
+config.RegisterTransient<Interface, Implementation>();
+config.RegisterSingleton<Interface1, Implementation1>();
+...
+```
+
+2.Creating Dependency Provider:
+
+```csharp
+
+//should be created once in app lifecycle.
+
+var provider = new DependencyProvider(config);
+
+```
+
+3. Resolving dependencies:
+
+```csharp
+
+var x = provider.Resolve<Interface>();
+//x - Implementation.
 ```
