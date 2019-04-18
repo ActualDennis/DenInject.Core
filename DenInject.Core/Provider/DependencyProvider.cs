@@ -1,4 +1,5 @@
 ﻿using DenInject.Core.Extensions;
+using DenInject.Core.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -95,35 +96,20 @@ namespace DenInject.Core {
                 return result.First();
         }
 
-        private Object CreateObjectRecursive(Type classType, Type interfaceType, bool IsOpenGenerics)
+        private Object CreateObjectRecursive(Type implementationType, Type interfaceType, bool IsOpenGenerics)
         {
-            var constructorDependencies = GetConstructorDependencies(classType, interfaceType, IsOpenGenerics);
+            var parametersToPass = GetResolvedConstructorParameters(implementationType, interfaceType, IsOpenGenerics);
 
-            if (constructorDependencies.Count().Equals(0))
-              return CreateObjectCore(null, classType, interfaceType, IsOpenGenerics);
-
-            var parametersToPass = new object[constructorDependencies.Count()];
-
-            for (int dependency = 0; dependency < constructorDependencies.Count(); ++dependency)
-            {
-                parametersToPass[dependency] = ResolveCore(constructorDependencies[dependency]);
-            }
-
-            return CreateObjectCore(parametersToPass, classType, interfaceType, IsOpenGenerics);
-        }
-
-        private Object CreateObjectCore(object[] constructorParams, Type implementationType, Type interfaceType, bool IsOpenGenerics)
-        {
             var lifeTime = m_Configuration.GetObjectLifeTime(implementationType);
 
             switch (lifeTime)
             {
                 case ObjLifetime.Transient:
                     {
-                         if (IsOpenGenerics)
-                            return CreateGenericObject(constructorParams, implementationType, interfaceType, lifeTime);
+                        if (IsOpenGenerics)
+                            return CreateObject(parametersToPass, implementationType.MakeGenericType(interfaceType.GenericTypeArguments), interfaceType, lifeTime);
 
-                        return CreateObjInternal(constructorParams, implementationType, interfaceType, lifeTime);
+                        return CreateObject(parametersToPass, implementationType, interfaceType, lifeTime);
 
                     }
                 case ObjLifetime.Singleton:
@@ -132,9 +118,9 @@ namespace DenInject.Core {
                             return GetCreatedObject(implementationType);
 
                         if (IsOpenGenerics)
-                            return CreateGenericObject(constructorParams, implementationType, interfaceType, lifeTime);
+                            return CreateObject(parametersToPass, implementationType.MakeGenericType(interfaceType.GenericTypeArguments), interfaceType, lifeTime);
 
-                        return CreateObjInternal(constructorParams, implementationType, interfaceType, lifeTime);
+                        return CreateObject(parametersToPass, implementationType, interfaceType, lifeTime);
                     }
                 case ObjLifetime.SingletonInstance:
                     {
@@ -147,23 +133,17 @@ namespace DenInject.Core {
             }
         }
 
-        private Object CreateGenericObject(object[] constructorParams, Type implementationType, Type interfaceType, ObjLifetime lifetime)
-        {
-            //Set object type arguments to ones mentioned in container.
-            return CreateObjInternal(constructorParams, implementationType.MakeGenericType(interfaceType.GenericTypeArguments), interfaceType, lifetime);
-        }
-
-        private Object CreateObjInternal(object[] constructorParams, Type implementationType, Type interfaceType, ObjLifetime lifetime)
+        private Object CreateObject(object[] constructorParams, Type implementationType, Type interfaceType, ObjLifetime lifetime)
         {
             object createdObj;
 
-            if (constructorParams == null)
+            if (constructorParams.Length.Equals(0))
             {
                 createdObj = Activator.CreateInstance(implementationType);
             }
             else
             {
-                createdObj = GetConstructor(implementationType).Invoke(constructorParams);
+                createdObj = ReflectionHelper.GetConstructor(implementationType)?.Invoke(constructorParams);
             }
 
             if(lifetime == ObjLifetime.Singleton)
@@ -179,19 +159,23 @@ namespace DenInject.Core {
             return createdObj;
         }
 
-        private bool IsObjectCreated(Type t)
+        private object[] GetResolvedConstructorParameters(Type implementationType, Type interfaceType, bool IsOpenGenerics)
         {
-            return SingletonObjects.Find(x => x.ObjType == t) != null;
-        }
+            var constructorDependencies = GetConstructorDependencies(implementationType, interfaceType, IsOpenGenerics);
 
-        private Object GetCreatedObject(Type t)
-        {
-            return SingletonObjects.Find(x => x.ObjType == t).SingletonInstance;
+            var parametersToPass = new object[constructorDependencies.Count()];
+
+            for (int dependency = 0; dependency < constructorDependencies.Count(); ++dependency)
+            {
+                parametersToPass[dependency] = ResolveCore(constructorDependencies[dependency]);
+            }
+
+            return parametersToPass;
         }
 
         private List<Type> GetConstructorDependencies(Type classType, Type interfaceType, bool IsOpenGenerics)
         {
-            var constructor = GetConstructor(classType);
+            var constructor = ReflectionHelper.GetConstructor(classType);
 
             if (constructor == null)
                 return null;
@@ -203,6 +187,8 @@ namespace DenInject.Core {
 
             if (!IsOpenGenerics)
                 return dependencies;
+
+            //Fill open generics constructor dependencies.
 
             var result = new List<Type>();
 
@@ -228,11 +214,14 @@ namespace DenInject.Core {
 
             return result;
         }
-
-        private ConstructorInfo GetConstructor(Type classType)
+        private bool IsObjectCreated(Type t)
         {
-            var constructors = classType.GetConstructors();
-            return constructors.Length == 0 ? null : constructors[0];
+            return SingletonObjects.Find(x => x.ObjType == t) != null;
+        }
+
+        private Object GetCreatedObject(Type t)
+        {
+            return SingletonObjects.Find(x => x.ObjType == t)?.SingletonInstance;
         }
     }
 }

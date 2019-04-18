@@ -22,12 +22,13 @@ namespace DenInject.Core {
             if (ContainsCircularDependencies(newType))
                 throw new ArgumentException($"Type {newType.ToString()} did contain circular dependencies.");
 
+            //if type doesn't have a constructor, we'll be unable to create it
+
+            if (!HasPublicConstructor(newType))
+                throw new ArgumentException($"Type {newType.ToString()} doesn't have a public constructor.");
+
             var typeConstructors = newType.GetConstructors();
 
-            //if type do not have constructor, we'll be unable to create it
-
-            if (typeConstructors.Length.Equals(0))
-                throw new ArgumentException($"{newType.ToString()} doesn't have constructors.");
 
             ParameterInfo[] constructorParams = typeConstructors[0].GetParameters();
 
@@ -48,6 +49,11 @@ namespace DenInject.Core {
                 }
             }
 
+        }
+
+        private bool HasPublicConstructor(Type t)
+        {
+            return t.GetConstructors().Length != 0;
         }
 
         private bool ContainsCircularDependencies(Type t)

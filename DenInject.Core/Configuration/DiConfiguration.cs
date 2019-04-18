@@ -21,9 +21,6 @@ namespace DenInject.Core {
         /// <param name="implementationType"></param>
         public void RegisterTransient(Type interfaceType, Type implementationType)
         {
-            if (interfaceType.IsValueType || implementationType.IsValueType)
-                throw new InvalidOperationException("Both implementation and interface should be reference types.");
-
             RegisterCore(interfaceType, implementationType, ObjLifetime.Transient);
         }
 
@@ -35,9 +32,6 @@ namespace DenInject.Core {
         /// <param name="implementationType"></param>
         public void RegisterSingleton(Type interfaceType, Type implementationType)
         {
-            if (interfaceType.IsValueType || implementationType.IsValueType)
-                throw new InvalidOperationException("Both implementation and interface should be reference types.");
-
             RegisterCore(interfaceType, implementationType, ObjLifetime.Singleton);
         }
 
@@ -83,7 +77,7 @@ namespace DenInject.Core {
         private void RegisterCore(Type interfaceType, Type implementationType,  ObjLifetime lifetime)
         {
             //Registration 'as-self'
-            if(interfaceType == implementationType)
+            if (interfaceType == implementationType)
             {
                 RegisterAsSelf(implementationType, lifetime);
                 return;
@@ -183,7 +177,9 @@ namespace DenInject.Core {
 
         internal ObjLifetime GetObjectLifeTime(Type implType)
         {
-            return (from conf in Configuration from impl in conf.Implementations where impl.ImplType == implType select impl.LifeTime).First();
+            return (from conf in Configuration
+                    from impl in conf.Implementations
+                    where impl.ImplType == implType select impl.LifeTime).First();
         }
 
         internal object GetSingletonInstance(Type interfaceType)
@@ -202,6 +198,9 @@ namespace DenInject.Core {
 
             if (implementationType.IsAbstract || implementationType.IsInterface)
                 throw new InvalidOperationException($"Type {implementationType.ToString()} couldn't be abstract or interface.");
+
+            if (interfaceType.IsValueType || implementationType.IsValueType)
+                throw new InvalidOperationException("Both implementation and interface should be reference types.");
         }
 
 

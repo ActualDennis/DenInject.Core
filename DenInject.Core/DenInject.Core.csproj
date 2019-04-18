@@ -49,15 +49,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ContainerEntity.cs" />
-    <Compile Include="CreatedObject.cs" />
-    <Compile Include="DependencyProvider.cs" />
-    <Compile Include="DiConfiguration.cs" />
-    <Compile Include="DiValidator.cs" />
+    <Compile Include="Configuration\ContainerEntity.cs" />
+    <Compile Include="Helpers\ReflectionHelper.cs" />
+    <Compile Include="Provider\CreatedObject.cs" />
+    <Compile Include="Configuration\DiConfiguration.cs" />
     <Compile Include="Extensions\ListObjectExtensions.cs" />
-    <Compile Include="Implementation.cs" />
-    <Compile Include="ObjLifetime.cs" />
+    <Compile Include="Configuration\Implementation.cs" />
+    <Compile Include="Configuration\ObjLifetime.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Provider\DependencyProvider.cs" />
+    <Compile Include="Provider\DiValidator.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
