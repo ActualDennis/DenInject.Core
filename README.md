@@ -78,6 +78,8 @@ public User(Lazy<IProduct> product)
 }
 ```
 
+<strong>Tip</strong>: If you're planning to use multiple containers as mentioned [here](https://blog.ploeh.dk/2010/09/29/TheRegisterResolveReleasepattern/) , be sure to set *DependencyProvider.Instance* static field to desired provider before resolving dependency, despite it sets automatically after new object creation.
+
 ## Usage
 
 1. Registering dependencies:
