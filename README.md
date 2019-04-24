@@ -3,7 +3,7 @@ If you have no idea what DI is and what it's for, see [this](https://docs.micros
 
 ## What can it do?
 
-1. Transient / singleton / singleton instance dependencies registration.
+### 1. Transient / singleton / singleton instance dependencies registration.
 
 Based on constructor dependencies [injection](https://en.wikipedia.org/wiki/Dependency_injection#Constructor_injection_comparison) 
 
@@ -20,7 +20,7 @@ config.RegisterSingleton<IProduct, FirstProduct>();
 config.RegisterSingleton<IUser>(new User() { Balance = 5427 });
 ```
 
-2. One to many registration.
+### 2. One to many registration.
 
 ``` csharp
 
@@ -41,7 +41,7 @@ provider.Resolve<IEnumerable<IProduct>>();
 
 ```
 
-3. Open generics:
+### 3. Open generics:
 ``` csharp
 
 config.RegisterTransient<IRepository, SomeRepository>();
@@ -51,6 +51,31 @@ config.RegisterTransient(typeof(IService<>), typeof(SomeService<>));
 
 provider.Resolve<IService<SomeRepository>>()
 
+```
+
+### 4. Weak references:
+
+Let's say we have these two constructors:
+``` csharp
+ public FirstProduct(IUser user)// FirstProduct implements IProduct
+ {
+     this.user = user;
+ }
+
+public User(IProduct product)//User implements IUser
+{
+    x = product;
+}
+```
+
+We'll be unable to create user or product, because they rely on each other. To fix this, wrap either IUser or IProduct in Lazy<T> class like this:
+ 
+ ``` csharp
+//creates with no issues
+public User(Lazy<IProduct> product)
+{
+    x = product;
+}
 ```
 
 ## Usage
