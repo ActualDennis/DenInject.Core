@@ -7,9 +7,11 @@ namespace DenInject.Tests.TestData {
         public int Balance { get; set; } = 512;
         public int GetBalance() => Balance;
 
-        public User()
-        {
+        public Lazy<IProduct> x { get; set; }
 
+        public User(Lazy<IProduct> product)
+        {
+            x = product;
         }
     }
 }

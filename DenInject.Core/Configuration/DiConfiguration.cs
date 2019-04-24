@@ -114,8 +114,10 @@ namespace DenInject.Core {
             entity.First().Implementations.Add(new Implementation() { ImplType = implementationType, LifeTime = lifetime });
         }
 
+
         private void RegisterSingletonInstance(Type interfaceType, object instance)
         {
+
             var entity =
                from x in Configuration
                where x.InterfaceType == interfaceType
@@ -193,6 +195,9 @@ namespace DenInject.Core {
 
         private void ValidateInterfaceAndImplementation(Type interfaceType, Type implementationType)
         {
+            if (interfaceType == implementationType)
+                return;
+
             if (implementationType.GetInterfaces().FirstOrDefault(x => x.Name == interfaceType.Name) == null)
                 throw new InvalidOperationException($"Type {implementationType.ToString()} is not assignable from {interfaceType.ToString()}");
 

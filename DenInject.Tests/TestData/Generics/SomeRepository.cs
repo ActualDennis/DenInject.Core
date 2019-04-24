@@ -4,7 +4,9 @@ using System.Text;
 
 namespace DenInject.Tests.TestData.Generics {
     public class SomeRepository : IRepository {
-        public void AddTo(int index) => throw new NotImplementedException();
-        public void DeleteAt(int index) => throw new NotImplementedException();
+        public void AddTo(int index) { }
+        public void DeleteAt(int index) { }
+
+        public int field { get; set; }
     }
 }

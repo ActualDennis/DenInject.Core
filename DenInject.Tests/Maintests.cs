@@ -4,6 +4,7 @@ using DenInject.Tests.TestData.Generics;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Tests {
@@ -127,19 +128,34 @@ namespace Tests {
         [Test] 
         public void SingletonInstanceTest()
         {
-            config.RegisterSingleton<IUser>(new User() { Balance = 5427 });
+            config.RegisterSingleton<SomeRepository>(new SomeRepository() {  field = 5427 });
 
             provider = new DependencyProvider(config);
 
-            IUser item = null;
+            SomeRepository item = null;
 
             Assert.DoesNotThrow(() => provider.ValidateConfig());
 
-            Assert.DoesNotThrow(() => item = provider.Resolve<IUser>());
+            Assert.DoesNotThrow(() => item = provider.Resolve<SomeRepository>());
 
-            Assert.That(item.GetBalance() == 5427);
+            Assert.That(item.field == 5427);
 
             Assert.NotNull(item);
         }
+
+        [Test]
+        public void LazyTest()
+        {
+            config.RegisterTransient<IUser, User>();
+            config.RegisterTransient<IProduct, FirstProduct>();
+
+            provider = new DependencyProvider(config);
+
+            IUser user = null;
+
+            Assert.DoesNotThrow(() => user = provider.Resolve<IUser>());
+            Assert.NotNull(user.x);
+        }
+
     }
 }

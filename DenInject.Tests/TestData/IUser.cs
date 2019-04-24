@@ -5,5 +5,7 @@ using System.Text;
 namespace DenInject.Tests.TestData {
     public interface IUser {
         int GetBalance();
+
+        Lazy<IProduct> x { get; set; }
     }
 }
