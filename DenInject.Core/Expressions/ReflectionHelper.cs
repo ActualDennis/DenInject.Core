@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DenInject.Core.Helpers
+namespace DenInject.Core.Expressions
 {
     internal static class ReflectionHelper
     {

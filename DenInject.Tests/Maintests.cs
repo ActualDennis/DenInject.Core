@@ -1,4 +1,5 @@
 using DenInject.Core;
+using DenInject.Core.Expressions;
 using DenInject.Tests.TestData;
 using DenInject.Tests.TestData.Generics;
 using NUnit.Framework;
@@ -156,6 +157,24 @@ namespace Tests {
             Assert.DoesNotThrow(() => user = provider.Resolve<IUser>());
             Assert.NotNull(user.x);
         }
+
+        [Test]
+        public void CacheTest()
+        { 
+            config.RegisterTransient<IUser, User>();
+            config.RegisterTransient<IProduct, FirstProduct>();
+
+            provider = new DependencyProvider(config);
+
+            IUser user = null;
+
+            for(int i = 0; i < 100; ++i)
+            {
+                Assert.DoesNotThrow(() => user = provider.Resolve<IUser>());
+                Assert.NotNull(user.x);
+            }
+        }
+
 
     }
 }

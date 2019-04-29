@@ -1,5 +1,5 @@
 ﻿using DenInject.Core.Extensions;
-using DenInject.Core.Helpers;
+using DenInject.Core.Expressions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,11 +22,14 @@ namespace DenInject.Core {
 
         public static DependencyProvider Instance { get; set; }
 
+        public static ILazyExpressionTreesCompiler<Func<object>> LazyExpressionTreesCompiler { get; set; }
+
         public DependencyProvider(DiConfiguration config)
         {
             m_Configuration = config;
             SingletonObjects = new List<CreatedObject>();
             Validator = new DiValidator(config.Configuration);
+            LazyExpressionTreesCompiler = new LazyExpressionTreesCompiler(new LazyExpressionTreesCache());
             Instance = this;
         }
 
@@ -62,10 +65,7 @@ namespace DenInject.Core {
         {
             bool IsAllImplementationsRequested = false;
 
-            ContainerEntity containerEntity = 
-                m_Configuration
-                .Configuration
-                .Find(x => x.InterfaceType == interfaceType);
+            ContainerEntity containerEntity = m_Configuration.GetRegisteredEntity(interfaceType);
 
             if(containerEntity == null)
             {
@@ -73,25 +73,13 @@ namespace DenInject.Core {
 
                 if (genericTypeDefinition == typeof(IEnumerable<>))
                 {
-                    //check if this is request for all implementations / only one 
-                    //i.e IEnumerable<T> => T implementations or IEnumerable<T> implementation
+                    //This is request for all implementatios
+                    
+                    interfaceType = interfaceType.GetGenericArguments()[0];
 
-                    var IsenumerableRegistered =
-                    m_Configuration
-                    .Configuration  //IEnumerable<T> implementation exists
-                    .Any(x => x.InterfaceType == interfaceType);
+                    IsAllImplementationsRequested = true;
 
-                    if (!IsenumerableRegistered)
-                    {
-                        interfaceType = interfaceType.GetGenericArguments()[0];
-
-                        IsAllImplementationsRequested = true;
-
-                        containerEntity = m_Configuration
-                                        .Configuration
-                                        .Find(x => x.InterfaceType == interfaceType);
-                    }
-
+                    containerEntity = m_Configuration.GetRegisteredEntity(interfaceType);
                 }
                 else if (genericTypeDefinition == typeof(Lazy<>))
                 {
@@ -100,7 +88,7 @@ namespace DenInject.Core {
                 else
                 {
                     //Probably we are using open generics.
-                    containerEntity = m_Configuration.Configuration.Find(x => x.InterfaceType == genericTypeDefinition);
+                    containerEntity = m_Configuration.GetRegisteredEntity(genericTypeDefinition);
                 }
             }
 
@@ -125,55 +113,11 @@ namespace DenInject.Core {
                 return result.First();
         }
 
+
         private Object CreateLazy(Type lazyType)
         {
             // var x = new Lazy<Object>(() => CreateLazy(null));
-            Type lazyClass = lazyType.GetGenericArguments()[0];
-
-            var lazyInitDelegateSignature =
-                typeof(Func<>)
-                .MakeGenericType(
-                    new Type[1]
-                    {
-                        lazyClass
-                    });
-
-
-            var newObjectExpression = 
-            Expression.New
-            (
-                lazyType.GetConstructor
-                (
-                    new Type[1]
-                    {
-                        typeof(Func<>).MakeGenericType(lazyClass)
-                    }
-                ),
-                new Expression[1]
-                {
-                    Expression.Lambda(
-
-                            Expression.Convert
-                            (
-                                Expression.Call
-                                (
-                                    Expression.Constant(Instance, typeof(DependencyProvider)),
-                                    typeof(DependencyProvider)
-                                    .GetProperty("Instance")
-                                        .PropertyType
-                                        .GetMethod("ResolveCore"),
-
-                                    Expression.Constant(lazyClass)
-                                ),
-                                lazyClass
-                            )
-                        )
-                }
-            );
-
-            var compiled = Expression.Lambda<Func<object>>(newObjectExpression).Compile();
-
-            return compiled.Invoke();
+            return LazyExpressionTreesCompiler.Compile(lazyType).Invoke();
         }
 
         private Object CreateObjectRecursive(Type implementationType, Type interfaceType, bool IsOpenGenerics)

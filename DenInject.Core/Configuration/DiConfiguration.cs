@@ -74,6 +74,16 @@ namespace DenInject.Core {
             RegisterSingletonInstance(typeof(TInterface), instance);
         }
 
+        internal ContainerEntity GetRegisteredEntity(Type interfaceType)
+        {
+            return Configuration.Find(x => x.InterfaceType == interfaceType);
+        }
+
+        internal bool EntityExists(Type interfaceType)
+        {
+            return Configuration.Any(x => x.InterfaceType == interfaceType);
+        }
+
         private void RegisterCore(Type interfaceType, Type implementationType,  ObjLifetime lifetime)
         {
             //Registration 'as-self'

@@ -50,7 +50,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\ContainerEntity.cs" />
-    <Compile Include="Helpers\ReflectionHelper.cs" />
+    <Compile Include="Expressions\LazyExpressionTreesCache.cs" />
+    <Compile Include="Expressions\LazyExpressionTreesCompiler.cs" />
+    <Compile Include="Expressions\ILazyExpressionTreesCache.cs" />
+    <Compile Include="Expressions\ILazyExpressionTreesCompiler.cs" />
+    <Compile Include="Expressions\ReflectionHelper.cs" />
     <Compile Include="Provider\CreatedObject.cs" />
     <Compile Include="Configuration\DiConfiguration.cs" />
     <Compile Include="Extensions\ListObjectExtensions.cs" />
