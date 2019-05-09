@@ -2,14 +2,14 @@
 <package >
   <metadata>
     <id>DenInject.Core</id>
-    <version>1.0.5</version>
+    <version>1.0.5.5</version>
     <title>DenInject.Core</title>
     <authors>actualdennis</authors>
     <owners>actualdennis</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Simple dependency injection container. For source code and examples, visit: https://github.com/ActualDennis/DenInject.Core 
 	Any feedback is highly appreciated: actualdennis@gmail.com</description>
-    <releaseNotes>Support for weak references; Many bug fixes.</releaseNotes>
+    <releaseNotes>Optimizations: Lazy expressions cache; refactoring</releaseNotes>
 	<tags>Dependency injection .NET Framework Singleton Transient OpenGenerics</tags>
     <copyright>Copyright 2019</copyright>
   </metadata>

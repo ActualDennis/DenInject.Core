@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DenInject.Core.Activators;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -43,12 +44,11 @@ namespace DenInject.Core.Expressions
                             (
                                 Expression.Call
                                 (
-                                    Expression.Constant(DependencyProvider.Instance, typeof(DependencyProvider)),
+                                    Expression.Constant(DependencyProvider.activator, typeof(DiActivator)),
                                     typeof(DependencyProvider)
-                                    .GetProperty("Instance")
+                                    .GetProperty("activator")
                                         .PropertyType
-                                            .GetMethod("ResolveCore"),
-
+                                            .GetMethod("Activate"),
                                     Expression.Constant(lazyClass)
                                 ),
                                 lazyClass
