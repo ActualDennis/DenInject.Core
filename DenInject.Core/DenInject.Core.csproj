@@ -49,16 +49,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Activators\DiActivator.cs" />
-    <Compile Include="Cache\Cache.cs" />
-    <Compile Include="Cache\ICache.cs" />
     <Compile Include="Configuration\ContainerEntity.cs" />
     <Compile Include="Expressions\LazyExpressionTreesCache.cs" />
     <Compile Include="Expressions\LazyExpressionTreesCompiler.cs" />
     <Compile Include="Expressions\ILazyExpressionTreesCache.cs" />
     <Compile Include="Expressions\ILazyExpressionTreesCompiler.cs" />
     <Compile Include="Expressions\ReflectionHelper.cs" />
-    <Compile Include="Injectors\ConstructorInjector.cs" />
     <Compile Include="Provider\CreatedObject.cs" />
     <Compile Include="Configuration\DiConfiguration.cs" />
     <Compile Include="Extensions\ListObjectExtensions.cs" />
